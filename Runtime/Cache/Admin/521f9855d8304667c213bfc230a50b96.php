@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>familyIncome/index?id=106

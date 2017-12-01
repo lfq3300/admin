@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>mc_article/index?art_cat_id=4

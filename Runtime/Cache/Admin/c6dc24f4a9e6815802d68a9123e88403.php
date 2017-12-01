@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>nobleEdit?id=31

@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>McRoom/editRoomManage?id=13

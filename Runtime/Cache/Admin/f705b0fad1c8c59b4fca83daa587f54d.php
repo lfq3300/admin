@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>seeOnline?time={live_time}&anchor_id=151

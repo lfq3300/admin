@@ -1,0 +1,1 @@
+<?php if (!defined('THINK_PATH')) exit();?>seeOnline?time={live_time}&time={live_time}

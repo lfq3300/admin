@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>websocket聊天界面</title>
+	<script src="__JS__/jquery.js" type="text/javascript" ></script>
+</head>
+<body>
+	<input type="type" name="" id="message"><button id="send">发送</button>
+	<ul id="ulbox">
+		
+	</ul>
+	<button id="clearMeg">清空</button>
+
+	<script type="text/javascript">
+		$("#send").click(function(){
+			$("#ulbox").append("<li>"+$("#message").val()+"</li>")
+		})
+		$("#clearMeg").click(function(){
+			$("#ulbox").children().remove();
+		})
+	</script>
+</body>
+</html>
