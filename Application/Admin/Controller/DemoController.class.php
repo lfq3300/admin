@@ -212,9 +212,33 @@ class DemoController extends AdminController{
 
 		$data = array(
 			array(
-				array(
-					
-				)
+				array("title()","\$str","与list相同","已完成"),
+				array("formtitle()","\$str","表单标题","已完成"),
+				array("data()","\$array","与list相同","已完成"),
+				array("keyText()","\$name,<br/>\$title,<br/>\$subtitle,<br/>\$opt",
+					"\$name 与data()相匹配 <br>
+					\$title 标题<br>
+					\$subtitle 副标题<br>
+					\$opt : array('placeholder'=>'提示文字','error'=>'警示文字')
+					",
+					"已完成"),
+				array("keyTime()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt","参数与 keyText() 相同 ,<br>作用: 将data中 时间戳转为 Y-m-d H:i:s","已完成"),
+				array("keyRadio()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt","参数与 keyText() 相同 ,<br> \$opt参数 checked 为 array  数组从1 开始  1为默认选中","已完成"),
+				array("keyNumber()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt","参数与 keyText() 相同 不过为只能输入数字","已完成"),
+				array("keyDisabled()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt","参数与 keyText() 相同 不过不能修改","已完成"),
+				array("keyHidden()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt","参数与 keyText() 相同  隐藏不可见的表单的元素","已完成"),
+				array("keyTextarea()","\$name,<br>\$title,<br>\$subtitle","参数与 keyText() 相同","已完成"),
+				array("keySelect()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt,<br>\$value","参数与 keyText() 相同,<br>\$opt 为数组<br> \$value 为选中的默认值","已完成"),
+				array("keyDisabledStatus()","\$name,<br>\$title,<br>\$subtitle,<br>\$opt,<br>\$value","不可选的select,参数与 keyText() 相同,<br>\$opt 为数组<br> \$value 为选中的默认值","已完成"),
+				array("keyUploadImg()","\$name,<br>\$title ='上传图片',<br>\$subtitle,<br>\$btntitle = '上传图片'","上传图片插件","已完成"),
+				array("keyUploadFalsh()","\$name,<br>\$title ='上传动画',<br>\$subtitle,<br>\$btntitle = '上传动画'","上传falsh插件","已完成"),
+				array("keyShowImg()","\$name","显示图片插件","已完成"),
+				array("keySmallEditor()","\$name","富文本编辑器 小的","已完成"),
+				array("keyEditor()","\$name","富文本编辑器 大的","已完成"),
+				array("keyOnSelect()","\$name,<br> \$title,<br> \$subtitle = null, <br>\$opt,<br>\$value","参数与keySelect相同,<br> 配合keyOnSelectData二级联动<br> 这是一级","已完成"),
+				array("keyOnSelectData()","\$name,<br> \$title,<br> \$subtitle = null, <br>\$opt,<br>\$value","参数与keySelect相同,<br> 配合keyOnSelect二级联动
+					<br>这是二级","已完成"),
+				array("buttonSubmit()","","提交form表单  提交到当前页 post","已完成"),
 			)
 		);
 		$newdata  = array();
@@ -228,3 +252,4 @@ class DemoController extends AdminController{
 
 }
 ?>
+

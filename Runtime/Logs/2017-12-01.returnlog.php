@@ -5,3 +5,5 @@
 {time:2017-12-01 15:04:02}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"121"}}{returnData:{"ret":1,"msg":null}}
 {time:2017-12-01 15:14:26}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"121"}}{returnData:{"ret":1,"msg":null}}
 {time:2017-12-01 16:12:37}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"122"}}{returnData:{"ret":1,"msg":null}}
+{time:2017-12-01 16:29:00}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"121"}}{returnData:{"ret":1,"msg":null}}
+{time:2017-12-01 16:29:02}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"120"}}{returnData:{"ret":1,"msg":null}}
