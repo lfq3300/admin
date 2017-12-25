@@ -1,17 +1,8 @@
-<?php 
+﻿<?php 
 return array(
 
-	  /* 数据库配置 */
-//    'DB_TYPE'   => 'mysqli', // 数据库类型
-//    'DB_HOST'   => '127.0.0.1', // 服务器地址 阿里云119.23.21.28 ，测试机39.108.169.131
-//    'DB_NAME'   => 'meicoolive', // 数据库名
-//    'DB_USER'   => 'root', // 用户名
-//    'DB_PWD'    => 'root',  // 密码
-//    'DB_PORT'   => '3306', // 端口
-//    'DB_PREFIX' => 'mc_', // 数据库表前缀
-
     'DB_TYPE'   => 'mysqli', // 数据库类型
-    'DB_HOST'   => '47.100.12.148', // 服务器地址 阿里云119.23.21.28 ，测试机39.108.169.131
+    'DB_HOST'   => '47.100.12.148',
     'DB_NAME'   => 'admin', // 数据库名
     'DB_USER'   => 'root', // 用户名
     'DB_PWD'    => '3300',  // 密码
@@ -27,8 +18,8 @@ return array(
        '__PUBLIC__'=> __ROOT__ . '/Public',
 	),
     //关于路径配置
-    'ADMIN_URL' =>'http://luo:94/admin.php/',
-    'ADMIN_ROOT' =>'http://luo:94',
+    'ADMIN_URL' =>'http://127.0.0.1:80/admin.php/',
+    'ADMIN_ROOT' =>'http://127.0.0.1:80',
     'ADMIN_UPLOAD_ROOT' =>'',
 
 //    'ADMIN_URL' =>'http://payapi.meicool.com/newadmin/admin.php/',
