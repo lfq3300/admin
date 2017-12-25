@@ -8,3 +8,4 @@
 {time:2017-12-25 17:00:38}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"120"}}{returnData:{"ret":1,"msg":null}}
 {time:2017-12-25 17:00:42}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"121"}}{returnData:{"ret":1,"msg":null}}
 {time:2017-12-25 17:00:45}{uri:/admin.php/index/menuindex.html}{postData:{"pid":"119","cid":"122"}}{returnData:{"ret":1,"msg":null}}
+{time:2017-12-25 17:09:45}{uri:/admin.php/index/login.html}{postData:{"account":"root","password":"3300"}}{returnData:{"ret":1,"msg":null}}
