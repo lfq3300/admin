@@ -68,16 +68,17 @@
                                     <span class="am-icon-sign-out"></span> 退出
                                 </a>
                             </li>
+                            <eq name="level"  value="-100000000">
+                                <li class="am-text-sm" >
+                                    <a  href="/newadmin/cc.php" target="_blank">
+                                        <span class="am-icon-birthday-cake"> 清空缓存</span>
+                                    </a>
+                                </li>
+                            </eq>
                         </ul>
                         <script type="text/javascript">
                             function exitlogin(){
-                                $.ajax({
-                                    type:"POST",
-                                    url:"{:U('Index/exitlogin')}",
-                                    success:function(){
-                                        window.location.href ="{:U('Admin/Index/index')}";
-                                    }
-                                })
+                              window.location.href ="{:U('Admin/Index/index')}";
                             }
                         </script>
                     </div>

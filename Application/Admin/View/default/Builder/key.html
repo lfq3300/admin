@@ -17,7 +17,7 @@
 			</php>
 			<div class="am-u-sm-4">
 		        <input type="text" name="{$field.name}" class="tpl-form-input" placeholder="{$field.opt.placeholder}"
-		        value="{$value}"  disabled="disabled">
+		        value="{$value}"  disabled="disabled" style="border: none;">
 		        <small>{$field.opt.error}</small>
 		    </div>
 			<div class="am-u-sm-6">{$field.opt.prompt}</div>
@@ -86,6 +86,15 @@
 			<div class="am-u-sm-4">
 				<input type="text" name="{$field.name}" class="tpl-form-input"  data-am-datepicker  value="{$value}" readonly>
 				<small>{$field.opt.error}</small>
+			</div>
+			<div class="am-u-sm-6">{$field.opt.prompt}</div>
+		</div>
+	</case>
+	<case value="span">
+		<div class="am-form-group">
+			<label for="user-intro" class="am-u-sm-2 am-form-label">{$field.title} </label>
+			<div class="am-u-sm-4">
+				<span>{$field.value}</span>
 			</div>
 			<div class="am-u-sm-6">{$field.opt.prompt}</div>
 		</div>
@@ -162,9 +171,8 @@
                 <div class="am-form-group am-form-file" >
                    	<empty name="$field.value">
                    		 <div class="tpl-form-file-img">
-                        	<img src="{$field.value}" id="img_{$field.name}" style='max-width:150px;max-height:150px'>
+                        	<img style='max-width:150px;max-height:150px' src="{$field.value}" id="img_{$field.name}" style='max-width:150px;max-height:150px'>
                     	</div>
-
                    	</empty>
                 	<input type="hidden" id="img_field_hidden_{$field.name}" name="{$field.name}"  value="{$field.value}">
                 	<div id="fileImg_{$field.name}">
@@ -179,7 +187,7 @@
         </div>
         <script type="text/javascript">
     		$(function(){
-    			function initWebuploader(){
+    			function init{$field.name}Webuploader(){
     				var uploader_{$field.name} = WebUploader.create({
 		        		 auto: true,
 		        		 swf: "__JS__/Uploader.swf",
@@ -202,10 +210,10 @@
 		        	});
 		        	uploader_{$field.name}.on("uploadFinished", function () {
 				        uploader_{$field.name}.destroy();
-				        initWebuploader();
+				        init{$field.name}Webuploader();
 				    });
     			}
-    			initWebuploader();
+    			init{$field.name}Webuploader();
     		})
         </script>
 	</case>
@@ -219,7 +227,7 @@
                 <div class="am-form-group am-form-file" >
                		<div id="tpl-form-file-swf_{$field.name}">
                		 	<empty name="$field.value">
-                    		<embed src="{$field.value}" id="swf_{$field.name}"></embed>
+                    		<embed style='max-width:150px;max-height:150px' src="{$field.value}" id="swf_{$field.name}"></embed>
                     	</empty>
                 	</div>
                 	<input type="hidden" id="swf_field_hidden_{$field.name}" name="{$field.name}" value="{$field.value}">
@@ -237,7 +245,7 @@
         </div>
         <script type="text/javascript">
     		$(function(){
-    			function initWebuploader(){
+    			function init{$field.name}Webuploader(){
     				var uploader_{$field.name} = WebUploader.create({
 		        		 auto: true,
 		        		 swf: "__JS__/Uploader.swf",
@@ -257,20 +265,83 @@
 		        		if(data.ret == 1){
 		        			var data = data.data;
 		        			$("#swf_{$field.name}").remove()
-		        			var html = "<embed src='"+data.root_path+"' id='swf_{$field.name}'></embed>";
+		        			var html = "<embed style='max-width:150px;max-height:150px' src='"+data.root_path+"' id='swf_{$field.name}'></embed>";
 		        			$("#tpl-form-file-swf_{$field.name}").append(html);
 		        			$("#swf_field_hidden_{$field.name}").val(data.path);
 		        		}
 		        	});
 		        	uploader_{$field.name}.on("uploadFinished", function () {
 				        uploader_{$field.name}.destroy();
-				        initWebuploader();
+				        init{$field.name}Webuploader();
 				    });
     			}
-    			initWebuploader();
+    			init{$field.name}Webuploader();
     		})
         </script>
 	</case>
+	<case value="uploadwebp">
+		<div class="am-form-group">
+			<label class="am-u-sm-2 am-form-label">
+				{$field.title}
+				<span class="tpl-form-line-small-title">{$field.subtitle}</span>
+			</label>
+			<div class="am-u-sm-4">
+				<div class="am-form-group am-form-file" >
+					<div id="tpl-form-file-webp_{$field.name}">
+						<empty  name="$field.value">
+							<embed src="{$field.value}" id="webp_{$field.name}"></embed>
+						</empty>
+					</div>
+					<input type="hidden" id="webp_field_hidden_{$field.name}" name="{$field.name}" value="{$field.value}">
+					<div id="fileWebp_{$field.name}">
+						<button type="button"  class="am-btn am-btn-danger am-btn-sm">
+							<i class="am-icon-cloud-upload"></i> {$field.opt.btntitle}
+						</button>
+						<input id="webp-form-file_{$field.name}" type="file">
+					</div>
+				</div>
+			</div>
+			<div class="am-u-sm-6">
+				{$field.opt.prompt}
+			</div>
+		</div>
+		<script type="text/javascript">
+            $(function(){
+                function init{$field.name}Webuploader(){
+                    var uploader_{$field.name} = WebUploader.create({
+                        auto: true,
+                        swf: "__JS__/Uploader.swf",
+                        server:"{:U('Upload/UploadImg')}",
+                        pick:"#fileWebp_{$field.name}",
+                        formData:{"exts":"webp"},
+                        duplicate:true,
+                        accept: {
+                            title: 'Images',
+                            extensions: 'webp',
+                            mimeTypes: 'webp'
+                        }
+                    });
+                    uploader_{$field.name}.on("uploadSuccess",function(file,data){
+                        console.log(file);
+                        console.log(data);
+                        if(data.ret == 1){
+                            var data = data.data;
+                            $("#swf_{$field.name}").remove()
+                            var html = "<embed style='max-width:150px;max-height:150px' src='"+data.root_path+"' id='webp_{$field.name}'></embed>";
+                            $("#tpl-form-file-webp_{$field.name}").append(html);
+                            $("#webp_field_hidden_{$field.name}").val(data.path);
+                        }
+                    });
+                    uploader_{$field.name}.on("uploadFinished", function () {
+                        uploader_{$field.name}.destroy();
+                        init{$field.name}Webuploader();
+                    });
+                }
+                init{$field.name}Webuploader();
+            })
+		</script>
+	</case>
+
 	<case value="editor">
 		<div class="am-form-group">
 			<label class="am-u-sm-2 am-form-label">

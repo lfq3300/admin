@@ -3,6 +3,9 @@ namespace Admin\Controller;
 use Think\Controller;
 class IndexController extends Controller{
 	public function index($r = 50){
+        session('account',NULL);
+        session('account_id',NULL);
+        session('level',NULL);
         $this->display();
 	}
 	public  function  setAdminRoot(){
@@ -10,7 +13,7 @@ class IndexController extends Controller{
 	}
 
 	public  function  fountAdminRoot(){
-        if(M("account")->where(array("level"=>"-3300"))->count()>0){
+        if(M("account")->where(array("level"=>"-100000000"))->count()>0){
             return returnJson("0","已存在root账户");
         }else{
             $map['account'] = I('post.account');
@@ -35,7 +38,7 @@ class IndexController extends Controller{
         if(empty($ret)){
             returnJson("0","账号或密码错误");
         }else  if($ret["status"] == 0){
-            returnJson("0","该账户存在异常,以禁止登录");
+            returnJson("0","该账户存在异常,已禁止登录");
 		}else{
             session('account', $ret["account"]);
             session('account_id', $ret["id"]);
@@ -45,9 +48,9 @@ class IndexController extends Controller{
 	}
 
 	public function exitlogin(){
-        session('account',"");
-        session('account_id',"");
-        session('level',"");
+        session('account',NULL);
+        session('account_id',NULL);
+        session('level',NULL);
         $url = U("Index/index");
         header("Location: $url");
 	}

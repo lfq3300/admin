@@ -30,59 +30,8 @@ function returnJson($ret,$msg,$data=null)
     echo $return;
     exit;
 }
-function time_format($time = NULL, $format = 'Y-m-d H:i:s')
-{
-    $time = $time === NULL ? NOW_TIME : intval($time);
-    return date($format, $time);
-}
 
-function get_pic_with_domain($path,$default_path=''){
-  
-  if ($_SERVER['HTTPS'] != "on") {
-        $protocol = 'http';
-   }else{
-     $protocol = 'https';
-  }
 
-  if(strpos($path, 'http://')===0 || strpos($path, 'https://')===0)
-  {
-    //由于数据库不允许存储 http://xxx.com/Uploads/yy.jpg，只允许存储/Uploads/yy.jpg，为了防止误传，还是返回一下
-    return $path;
-  }
-
-  $path = !empty($path) ? $path : $default_path;
-  if(empty($path) && empty($default_path)){
-    return '';
-  }
-  return $protocol.'://'.C('IMG_HOST').$path;
-}
-
-function get_url_with_domain($path)
-{
-    //不存在http://
-    $not_http_remote = (strpos($path, 'http://') === false);
-    //不存在https://
-    $not_https_remote = (strpos($path, 'https://') === false);
-    $path = str_replace('./','/',$path);
-    if ($not_http_remote && $not_https_remote) {
-        //本地url
-        $root = trim(getRootUrl(), '/');
-        $path = trim($path, '/');
-        if (strpos($path, $root) === 0) {
-            $root = '';
-        }
-        $path = 'http://' . str_replace(array('////', '///', '//','./','\\'), '/', $_SERVER['HTTP_HOST'] . '/' . $root . '/' . $path);
-        return $path; //防止双斜杠的出现
-    } else {
-        //远端url
-        return $path;
-    }
-}
-function randomArray($array){
-    $len = count($array) -1;
-    $index = rand(0,$len);
-    return $array[$index];
-}
 
 
 function getIP($type = 0) {
@@ -106,38 +55,9 @@ function getIP($type = 0) {
 } 
 
 function is_phone($a) {
-    return preg_match('/^1[0123456789]\d{9}$/',$a)? true : false;
+    return preg_match('/^1\\d{10}$/',$a)? true : false;
 }
 
-function secondsToHour($time){
-    if(is_numeric($time)){
-        $value = array(
-            "years" => 0, "days" => 0, "hours" => 0,
-            "minutes" => 0, "seconds" => 0,
-        );
-        if($time >= 31556926){
-            $value["years"] = floor($time/31556926);
-            $time = ($time%31556926);
-        }
-        if($time >= 86400){
-            $value["days"] = floor($time/86400);
-            $time = ($time%86400);
-        }
-        if($time >= 3600){
-            $value["hours"] = floor($time/3600);
-            $time = ($time%3600);
-        }
-        if($time >= 60){
-            $value["minutes"] = floor($time/60);
-            $time = ($time%60);
-        }
-        $value["seconds"] = floor($time);
-        $t=$value["years"] ."年". $value["days"] ."天"." ". $value["hours"] ."小时". $value["minutes"] ."分".$value["seconds"]."秒";
-        Return $t;
-    }else{
-        return (bool) FALSE;
-    }
-}
 //验证银行卡号码
 function checkBankCard($bankCardNo){
     $strlen = strlen($bankCardNo);
@@ -154,11 +74,11 @@ function checkBankCard($bankCardNo){
 function is_idcards($vStr)
 {
     $vCity = array(
-        '11','12','13','14','15','21','22',
-        '23','31','32','33','34','35','36',
-        '37','41','42','43','44','45','46',
-        '50','51','52','53','54','61','62',
-        '63','64','65','71','81','82','91'
+        '11', '12', '13', '14', '15', '21', '22',
+        '23', '31', '32', '33', '34', '35', '36',
+        '37', '41', '42', '43', '44', '45', '46',
+        '50', '51', '52', '53', '54', '61', '62',
+        '63', '64', '65', '71', '81', '82', '91'
     );
 
     if (!preg_match('/^([\d]{17}[xX\d]|[\d]{15})$/', $vStr)) return false;
@@ -168,26 +88,54 @@ function is_idcards($vStr)
     $vStr = preg_replace('/[xX]$/i', 'a', $vStr);
     $vLength = strlen($vStr);
 
-    if ($vLength == 18)
-    {
+    if ($vLength == 18) {
         $vBirthday = substr($vStr, 6, 4) . '-' . substr($vStr, 10, 2) . '-' . substr($vStr, 12, 2);
     } else {
         $vBirthday = '19' . substr($vStr, 6, 2) . '-' . substr($vStr, 8, 2) . '-' . substr($vStr, 10, 2);
     }
 
     if (date('Y-m-d', strtotime($vBirthday)) != $vBirthday) return false;
-    if ($vLength == 18)
-    {
+    if ($vLength == 18) {
         $vSum = 0;
 
-        for ($i = 17 ; $i >= 0 ; $i--)
-        {
+        for ($i = 17; $i >= 0; $i--) {
             $vSubStr = substr($vStr, 17 - $i, 1);
-            $vSum += (pow(2, $i) % 11) * (($vSubStr == 'a') ? 10 : intval($vSubStr , 11));
+            $vSum += (pow(2, $i) % 11) * (($vSubStr == 'a') ? 10 : intval($vSubStr, 11));
         }
 
-        if($vSum % 11 != 1) return false;
+        if ($vSum % 11 != 1) return false;
     }
     return true;
 }
+//缓存操作
+function saveOperationUrl($href){
+    $starnum = strpos($href,"admin.php");
+    if($starnum !== false) {
+        $href = substr($href,$starnum + 9);
+        $urlarr = explode("/", $href);
+
+        //去除下划线
+        $urlarr[0] = str_replace("_", "", $urlarr[0]);
+        //去处.html
+        $urlarr[1] = str_replace(".html", "", $urlarr[1]);
+        //拼接
+        $thisurl = $urlarr[0] . "/" . $urlarr[1];
+    }else{
+        $thisurl = $href;
+    }
+    $adminid = session('account_id');
+    if($thisurl){
+        $allurlarr = S('operation'.$adminid);
+        if($allurlarr){
+            if(!in_array($thisurl,$allurlarr)){
+                $allurlarr[] = $thisurl;
+            }
+        }else{
+            $allurlarr = array();
+            $allurlarr[] = $thisurl;
+        }
+        S('operation'.$adminid,$allurlarr);
+    }
+}
+
 ?>

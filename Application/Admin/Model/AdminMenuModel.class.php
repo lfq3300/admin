@@ -28,18 +28,18 @@
 		}
 		
 		public function getNextMenuList($id){
-			$sql = "SELECT  A.sort,A.hide, A.url, A.id, A.title,B.`title` AS p_title FROM mc_admin_menu A LEFT JOIN mc_admin_menu B ON A.`p_id` = B.`id` WHERE A.`p_id` = %d";
+			$sql = "SELECT  A.is_family,A.sort,A.hide, A.url, A.id, A.title,B.`title` AS p_title FROM mc_admin_menu A LEFT JOIN mc_admin_menu B ON A.`p_id` = B.`id` WHERE A.`p_id` = %d";
 			$sqldata = M()->query($sql,$id);
 			return $sqldata;
 		}
 
 		public function getFirstMenuList(){
-			$sql = "SELECT  A.sort,A.hide,A.url,A.id,A.title,IFNULL(B.`title`,'一级目录') AS p_title FROM mc_admin_menu A LEFT JOIN mc_admin_menu B ON A.`p_id` = B.`id` WHERE A.`p_id` = 0";
+			$sql = "SELECT  A.is_family,A.sort,A.hide,A.url,A.id,A.title,IFNULL(B.`title`,'一级目录') AS p_title FROM mc_admin_menu A LEFT JOIN mc_admin_menu B ON A.`p_id` = B.`id` WHERE A.`p_id` = 0";
 			$sqldata = M()->query($sql);
 			return $sqldata;
 		}
 		public function getFirstMenuConfig(){
-			$sql = "SELECT sort,id,title FROM mc_admin_menu WHERE p_id = 0";
+			$sql = "SELECT is_family,sort,id,title FROM mc_admin_menu WHERE p_id = 0";
 			$data = array(array("id"=>"0","title"=>"一级目录"));
 			$sqldata = M()->query($sql);
 			return array_merge($data,$sqldata);

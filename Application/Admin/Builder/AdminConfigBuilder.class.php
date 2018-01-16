@@ -44,6 +44,9 @@ class AdminConfigBuilder extends AdminBuilder{
             $this->_savePostUrl = $url;
         }
     }
+    public function  keySpan($name,$title,$subtitle,$opt){
+        return $this->key($name, $title, $subtitle,'span',$opt);
+    }
     /*
 		$name from 表单提交name
 		$title from 表单模块标题
@@ -104,8 +107,11 @@ class AdminConfigBuilder extends AdminBuilder{
     public function keyUploadImg($name,$title ='上传图片', $subtitle,$btntitle = "上传图片"){
     	 return $this->key($name, $title, $subtitle,'uploadimg',array("btntitle"=>$btntitle));
     }
-    public function keyUploadFalsh($name,$title, $subtitle,$btntitle = "上传动画"){
+    public function keyUploadFalsh($name,$title, $subtitle,$btntitle = "上传Flash动画"){
          return $this->key($name, $title, $subtitle,'uploadfalsh',array("btntitle"=>$btntitle));
+    }
+    public  function  keyUploadWebp($name,$title, $subtitle,$btntitle = "上传webp动画"){
+        return $this->key($name, $title, $subtitle,'uploadwebp',array("btntitle"=>$btntitle));
     }
     public function keyShowImg($name,$title, $subtitle,$btntitle = "上传图片"){
          return $this->key($name, $title, $subtitle,'showimg',array("btntitle"=>$btntitle));

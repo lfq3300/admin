@@ -3,12 +3,24 @@ namespace Admin\Controller;
 use Think\Controller;
 use Admin\Builder\AdminListBuilder;
 use Admin\Builder\AdminConfigBuilder;
+use Common\Excel\UploadExcel;
 class AdminController extends Controller{
-    public function _initialize(){ //权限检测
-        $account = $_SESSION['account'];
+    public function _initialize(){ //检测是否登录
+        $account = $_SESSION['account_id'];
         if(empty($account)){
             $url = U("Index/index");
             header("Location: $url");
+        }
+        //权限检测
+        //获取当前URL
+        $adminid = session('account_id');
+        $controllername = CONTROLLER_NAME;
+        $actionname = ACTION_NAME;
+        $thisurl = $controllername."/".$actionname;
+        $allurlarr = S("menuChildrens".$adminid) === false ? S("menusChildrensFamily" .$adminid) : S("menuChildrens".$adminid);
+        $operation = S('operation'.$adminid);
+        if(!(deep_in_array($thisurl,$allurlarr)||deep_in_array($controllername,$allurlarr)||deep_in_array($thisurl,$operation)) && $thisurl!="Admin/admin" && !(session('level')=='-100000000') ){
+            $this->error("您没有访问该功能的权限，详情请询问开发人员");
         }
     }
 
@@ -25,11 +37,12 @@ class AdminController extends Controller{
 			->title("菜单管理")
 			->newButton(U("Admin/addMenu"))
 			->keyLink('title','标题',"nextMenu?id=###")
-			->keyText('p_title','所属目录')
+            ->keyText('p_title','所属目录')
 			->keyText('url','连接')
 			->keyText('sort','排序')
 			->keyStatus('hide','是否隐藏',array("0"=>'未隐藏',"1"=>"隐藏"))
-			->keyDoAction("editMenu?id=###")
+            ->keyStatus('is_family','族长是否可见',array("0"=>'不可见',"1"=>"可见"))
+			->keyDoActionEdit("editMenu?id=###")
 			->data($data)
 			->display();
 	}
@@ -37,18 +50,25 @@ class AdminController extends Controller{
 	public function addMenu(){
 		$model = D("Admin/AdminMenu");
 		if(IS_POST){
-
-			$data  = 
+			$data  =
 				array(
 					"title" =>I("post.title"),
 					"url"	=>I("post.url"),
 					"hide"	=>I("post.hide",0,"intval"),
 					"p_id"	=>I("post.p_id",0,"intval"),
-					"sort"	=>I("post.sort",1,"intval")
+					"sort"	=>I("post.sort",1,"intval"),
+                    "is_family"=>I("post.is_family",0,"intval")
 				);
 			if($model->create($data,1)){
 				$ret = $model->addMenu($data);
 				if($ret){
+				    //清除缓存
+                    $data = M("account")->field("id")->select();
+                    foreach ($data as $key =>$item){
+                        S("menus".$item["id"],NULL);
+                        S("menuChildrens".$item["id"],NULL);
+                        S("menuPower".$item["id"],NULL);
+                    }
 					$this->success("成功",U("index"));
 				}
 			}
@@ -63,13 +83,14 @@ class AdminController extends Controller{
 				->keyText('url','菜单连接','',array("placeholder"=>"一级目录无需连接"))
 				->keyText("sort","排序")
 				->keySelect('hide','是否隐藏',"",array("0"=>"不隐藏","1"=>"隐藏"))
+                ->keySelect('is_family','族长是否可见',"",array("0"=>"不可见","1"=>"可见"))
 				->buttonSubmit(U("Admin/addMenu"))
 				->display();
 		}
 	}
 
 
-   function getSearch($word =244555){
+   function getSearch($word){
         $map['A.anchor_id'] = $word;
         $map['_logic'] = 'OR';
         $map['B.username'] = array('like','%'.$word.'%');
@@ -82,7 +103,6 @@ class AdminController extends Controller{
             ->field('A.`anchor_id`,A.`port`,B.`username`,A.`anchor_img`,B.`sex`,B.`sign`,A.`follow_user`,C.`level`,A.`k_status`,A.`k_type`')
             ->limit(100)
             ->select();
-        print_r(M()->getLastSql());
         return $data;
     }
 	//查看下一级目录
@@ -99,7 +119,8 @@ class AdminController extends Controller{
 			->keyText('url','连接')
 			->keyText("sort","排序")
 			->keyStatus('hide','是否隐藏',array("0"=>'未隐藏',"1"=>"隐藏"))
-			->keyDoAction("editMenu?id=###")
+            ->keyStatus('is_family','族长是否可见',array("0"=>"不可见","1"=>"可见"))
+			->keyDoActionEdit("editMenu?p_id={$id}&id=###")
 			->data($data)
 			->display();
 
@@ -113,12 +134,23 @@ class AdminController extends Controller{
 					"url"	=>I("post.url"),
 					"hide"	=>I("post.hide",0,"intval"),
 					"p_id"	=>I("post.p_id",0,"intval"),
-					"sort"	=>I("post.sort",1,"intval")
+					"sort"	=>I("post.sort",1,"intval"),
+                    "is_family"=>I("post.is_family",0,"intval")
 				);
 				$id = I("post.id");
 				$ret = $model->saveMenu($data,$id);
 				if($ret){
-					$this->success("成功",U("index"));
+                    $data = M("account")->field("id")->select();
+                    foreach ($data as $key =>$item){
+                        S("menus".$item["id"],NULL);
+                        S("menuChildrens".$item["id"],NULL);
+                        S("menuPower".$item["id"],NULL);
+                    }
+                    if(I("post.p_id")){
+                        $this->success("成功",U("nextMenu",array("id"=>I("post.p_id"))));
+                    }else{
+                        $this->success("成功",U("index"));
+                    }
 				}else{
 					$this->error($model->getError());
 				}
@@ -126,16 +158,20 @@ class AdminController extends Controller{
 			$builder = new AdminConfigBuilder();
 			$pidList = $model->getFirstMenuConfig();
 			$id = I("get.id");
+            $p_id = I("get.p_id");
 			$pidList = i_array_column($pidList,'title','id');
 			list($data) = $model->getMenuInfo($id);
+			if($p_id)$data["p_id"] = $p_id;
 			$builder
-				->title("新增菜单")
+				->title("修改菜单")
 				->keyHidden("id")
+                ->keyHidden("p_id")
 				->keySelect("p_id","所属目录","",$pidList)
 				->keyText("title","标题")
 				->keyText('url','菜单连接','',array("placeholder"=>"一级目录无需连接"))
 				->keyText("sort","排序")
 				->keySelect('hide','是否隐藏',"",array("0"=>"不隐藏","1"=>"隐藏"))
+                ->keySelect('is_family','族长是否可见',"",array("0"=>"不可见","1"=>"可见"))
 				->buttonSubmit(U("Admin/editMenu"))
 				->data($data)
 				->display();
@@ -155,11 +191,11 @@ class AdminController extends Controller{
                 ->title("后台账号管理")
                 ->newButton(U("addAccount"))
                 ->keyText("account","账号")
-                ->keyText("level","权限等级")
+                ->keyStatus("level","权限等级",array("1"=>"管理员","2"=>"用户","3"=>"家族族长"))
                 ->keyText("status","账户状态")
-                ->keyDoAction("setPower?id=###","权限设置")
-                ->keyDoAction("setLoginOff?id=###","禁止登录")
-                ->keyDoAction("setLoginOn?id=###","允许登录")
+                ->keyDoActionEdit("setPower?id=###","权限设置")
+                ->keyDoActionEdit("setLoginOff?id=###","禁止登录")
+                ->keyDoActionEdit("setLoginOn?id=###","允许登录")
                 ->data($data)
                 ->display();
     }
@@ -181,6 +217,7 @@ class AdminController extends Controller{
             S("menus".$id,NULL); //清空账户的权限缓存
             S("menuChildrens".$id,NULL);
             S("menuPower".$id,NULL);
+            S("operation".$id,NULL);
             M("power")->where(array("account_id"=>$id))->delete();
            $one = I("post.one");
            $oneData = array();
@@ -241,10 +278,103 @@ class AdminController extends Controller{
             $builder->title("添加后台账号")
                 ->keyText("account","账号")
                 ->keyText("password","密码")
-               ->keyRadio("level","权限","",array("checked"=>array("1"=>"管理员")))
+                ->keyRadio("level","权限","",array("checked"=>array("1"=>"管理员","3"=>"族长")))
                 ->buttonSubmit()
                 ->display();
         }
     }
+    public  function setOperateMail()
+    {
+        $file_path = BASE_PATH."/operateMail.txt";
+        $data = array();
+        if (file_exists($file_path)) {
+            $file_arr = file($file_path);
+            for ($i = 0; $i < count($file_arr); $i++) {//逐行读取文件内容
+                if(!empty($file_arr[$i])){
+                    $a = array();
+                    $a["mail"] = $file_arr[$i];
+                    $a["id"] = $i;
+                    $data[] = $a;
+                }
+            }
+        }
+        $builder = new AdminListBuilder();
+        $builder
+            ->title("运营邮箱设置")
+            ->newButton("addOperateMail")
+            ->deleteButton("deleteOperateMail?id=###")
+            ->keyText("id", "邮箱ID")
+            ->keyText("mail", "邮箱")
+            ->data($data)
+            ->display();
+    }
+
+    public  function  deleteOperateMail($ids){
+        $filename = BASE_PATH."/operateMail.txt";
+        $data = array();
+        if (file_exists($filename)) {
+            $file_arr = file($filename);
+            for ($i = 0; $i < count($file_arr); $i++) {//逐行读取文件内容
+                if(!empty($file_arr[$i])){
+                    $a = array();
+                    $data[$i] = $file_arr[$i];
+                }
+            }
+        }
+        foreach ($ids as $key =>$val){
+            $this->delTargetLine($filename, $data[$val]);
+        }
+        $this->success("success",U('setOperateMail'));
+    }
+
+    public function delTargetLine($filePath, $target)
+    {
+        $arr=file($filePath);//获取文件所有内容
+        $fp=fopen($filePath,'w');
+        foreach ($arr as $line){
+            if ($line <> $target) fputs($fp, $line);
+        }
+        fclose($fp);
+//        $result = null;
+//        $fileCont = file_get_contents($filePath);
+//        dump($fileCont);
+//        $targetIndex = strpos($fileCont, $target);
+//        if ($targetIndex !== false) {
+//            $preChLineIndex = strrpos(substr($fileCont, 0, $targetIndex + 1), "\n");
+//            $AfterChLineIndex = strpos(substr($fileCont, $targetIndex), "\n") + $targetIndex;
+//            if ($preChLineIndex !== false && $AfterChLineIndex !== false) {
+//                $result = substr($fileCont, 0, $preChLineIndex + 1) . substr($fileCont, $AfterChLineIndex + 1);
+//                file_put_contents($filePath, $result);
+//            }
+//        }
+    }
+
+    public  function  addOperateMail(){
+        if(IS_POST){
+            if(I("mail")){
+                $filename = BASE_PATH."/operateMail.txt";
+                $fileCont = file_get_contents($filename);
+                 $targetIndex = strpos($fileCont, I("mail"));
+                if($targetIndex === false) {
+                    $txt = I("mail") . "\n";
+                    $myfile = fopen($filename, "a+");
+                    fputs($myfile, $txt);
+                    fclose($myfile);
+                    $this->success("添加成功", U("setOperateMail"));
+                }else{
+                    $this->error("添加失败，邮箱已存在", U("setOperateMail"));
+                }
+            }else{
+                $this->error("邮箱不能为空");
+            }
+        }else{
+            $builder = new AdminConfigBuilder();
+            $builder->title("设置新邮箱 <span style='font-size: 12px;color: red;'>此处未做邮箱验证, 请认真输入</span>")
+                ->keyText("mail","邮箱")
+                ->buttonSubmit()
+                ->display();
+        }
+    }
+
 }	
 ?>

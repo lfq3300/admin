@@ -59,40 +59,123 @@ $("#builderAllCheckbox").click(function(){
 
 //删除按钮操作
 $(".delete-ajax-post").click(function(){
-	var that = $(this);
-	var target, query, form;
-	var target_form = $(this).attr('target-form');
-	form = $('.' + target_form);
-	console.log(form);
-	query = form.serialize();
-	if(!query){
-		toast.error("请勾选删除对象");
-		return;
-	}
-	if(!confirm("删除行为不可逆,是否继续删除")){
-			return false;
-	}
-	$(that).addClass('am-disabled')
-	target = $(this).attr("href");
-	$.post(target,query).success(function(ret){	
-		if(ret.status == 1){
-			if(ret.url){
- 	 			toast.success(ret.info+load_text);
- 	 		}else{
- 	 			toast.success(ret.info);
- 	 		}
-		}else{
-			toast.error(ret.info);
-		}
-		setTimeout(function() {
-			if(ret.url) {
-				location.href = ret.url;
-			} else {
-				$(that).removeClass('am-disabled');
-			}
-		}, 1500);	
-	})
+    var that = $(this);
+    var target, query, form;
+    var target_form = $(this).attr('target-form');
+    form = $('.' + target_form);
+    query = form.serialize();
+    if(!query){
+        toast.error("请勾选操作对象");
+        return;
+    }
+    if(!confirm("删除行为不可逆,是否继续删除")){
+        return false;
+    }
+    $(that).addClass('am-disabled')
+    target = $(this).attr("href");
+    $.post(target,query).success(function(ret){
+        if(ret.status == 1){
+            if(ret.url){
+                toast.success(ret.info+load_text);
+            }else{
+                toast.success(ret.info);
+            }
+        }else{
+            toast.error(ret.info);
+        }
+        setTimeout(function() {
+            if(ret.url) {
+                location.href = ret.url;
+            } else {
+                $(that).removeClass('am-disabled');
+            }
+        }, 1500);
+    })
 })
+
+
+
+//一建操作按钮操作
+$(".verify-ajax-post").click(function(){
+    var that = $(this);
+    var target, query, form;
+    var target_form = $(this).attr('target-form');
+    form = $('.' + target_form);
+    query = form.serialize();
+    if(!query){
+        toast.error("请勾选操作对象");
+        return;
+    }
+    $(that).addClass('am-disabled')
+    target = $(this).attr("href");
+    $.post(target,query).success(function(ret){
+        if(ret.status == 1){
+            if(ret.url){
+                toast.success(ret.info+load_text);
+            }else{
+                toast.success(ret.info);
+            }
+        }else{
+            toast.error(ret.info);
+        }
+        setTimeout(function() {
+            if(ret.url) {
+                location.href = ret.url;
+            } else {
+                $(that).removeClass('am-disabled');
+            }
+        }, 1500);
+    })
+});
+
+$(function(){
+//一键操作不通过按钮操作
+    $(".verify-no-ajax-post").on("click",function(e){
+        var that = $(this);
+        var target, query, form;
+        var target_form = $(this).attr('target-form');
+        form = $('.' + target_form);
+        query = form.serialize();
+        if(!query){
+            toast.error("请勾选操作对象");
+            return;
+        }
+        target = $(this).attr("href");
+        $('#anchorImgVerify').modal({
+            relatedTarget: this,
+            onConfirm: function(e) {
+                var data = e.data;
+                query+="&status="+data[0];
+                query+="&reason="+data[1];
+                $.post(target,query).success(function(ret){
+                    console.log(ret);
+                    if(ret.status == 1){
+                        if(ret.url){
+                            toast.success(ret.info+load_text);
+                        }else{
+                            toast.success(ret.info);
+                        }
+                    }else{
+                        toast.error(ret.info);
+                    }
+                    setTimeout(function() {
+                        if(ret.url) {
+                            location.href = ret.url;
+                        } else {
+                            $(that).removeClass('am-disabled');
+                        }
+                    }, 1500);
+                })
+            },
+            onCancel: function(e) {
+
+            }
+        });
+    });
+})
+
+
+
 
 function autoLeftNav() {
     $('.tpl-header-switch-button').on('click', function() {
